@@ -7,6 +7,7 @@ authors = ["Alex Sadler <alexandersadler1@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.10"
 Django = "^4.1"
+python-dotenv = "^0.20.0"
 
 [tool.poetry.dev-dependencies]
 

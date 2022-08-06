@@ -8,6 +8,7 @@ authors = ["Alex Sadler <alexandersadler1@gmail.com>"]
 python = "^3.10"
 Django = "^4.1"
 python-dotenv = "^0.20.0"
+gunicorn = "^20.1.0"
 
 [tool.poetry.dev-dependencies]
 

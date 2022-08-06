@@ -26,7 +26,7 @@ SECRET_KEY = '#_8wp-cprhe^49lj*cqbwnbiuy#ml7&q+grt2_g1_84r1jmu5('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == "True"
 
-ALLOWED_HOSTS = ['*']  # TODO: currently unknown
+ALLOWED_HOSTS = ['friend-reminder.fly.dev']  # TODO: currently unknown
 
 
 # Application definition

@@ -22,7 +22,7 @@ RUN poetry install --no-dev
 
 COPY . .
 
-# RUN poetry run python manage.py collectstatic --noinput
+RUN poetry run python manage.py collectstatic --noinput
 
 
 EXPOSE 8080

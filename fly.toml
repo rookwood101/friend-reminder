@@ -8,9 +8,16 @@ processes = []
 [env]
   PORT = "8080"
 
+[mounts]
+  source= "db"
+  destination = "/db"
+
 [experimental]
   allowed_public_ports = []
   auto_rollback = true
+
+# [deploy]
+#   release_command = "poetry run python manage.py migrate"
 
 [[services]]
   http_checks = []
@@ -39,5 +46,6 @@ processes = []
     timeout = "2s"
 
 [[statics]]
-  guest_path = "/app/public"
+  guest_path = "/app/static"
   url_prefix = "/static/"
+

@@ -133,3 +133,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = ['http://localhost', 'https://friend-reminder.fly.dev']
+
+LOGOUT_REDIRECT_URL = '/'

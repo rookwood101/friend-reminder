@@ -1,1 +1,12 @@
+<a href="{% url 'logout' %}">Log Out</a>
 Hello world!
+
+<ul>
+{% for friend in friends %}
+    <li>{{ friend.name }}</li>
+{% endfor %}
+</ul>
+
+<div>
+Add Friend
+</div>

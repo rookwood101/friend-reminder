@@ -28,4 +28,4 @@ RUN poetry run python manage.py collectstatic --noinput
 EXPOSE 8080
 
 # replace APP_NAME with module name
-CMD ["poetry", "run", "gunicorn", "--bind", ":8080", "--workers", "2", "friend_reminder.wsgi"]
+CMD poetry run python manage.py migrate && poetry run gunicorn --bind :8080 --workers 2 friend_reminder.wsgi

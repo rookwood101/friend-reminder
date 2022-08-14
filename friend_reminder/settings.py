@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'friend_reminder.middleware.TimezoneMiddleware'
 ]
 
 ROOT_URLCONF = 'friend_reminder.urls'
@@ -117,6 +118,7 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+TIME_ZONE = 'Europe/London'
 
 
 # Static files (CSS, JavaScript, Images)

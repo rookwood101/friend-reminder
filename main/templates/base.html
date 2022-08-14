@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Friend reminder</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="" />
+    <script>
+        const timeZoneName = Intl.DateTimeFormat().resolvedOptions().timeZone
+        if (!document.cookie.includes('timezone')) {
+            document.cookie = 'timezone=' + encodeURIComponent(timeZoneName) + '; path=/'
+            location.reload()
+        }
+    </script>
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+    {% if request.user.is_authenticated %}
+        <a href='{% url 'logout' %}'>Log Out</a>
+    {% endif %}
+    {% block body %}
+    {% endblock %}
+</body>
+</html>

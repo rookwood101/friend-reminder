@@ -1,12 +1,25 @@
-<a href="{% url 'logout' %}">Log Out</a>
-Hello world!
+{% extends 'base.html' %}
 
+
+
+{% block head %}
+{% endblock %}
+
+
+{% block body %}
+<h2>Friends</h2>
 <ul>
 {% for friend in friends %}
-    <li>{{ friend.name }}</li>
+    <li>{{ friend.name }} - Every {{ friend.remind_period_days }} days - Next: {{ friend.next_reminder }} - Created: {{ friend.created_at }}</li>
 {% endfor %}
 </ul>
 
-<div>
-Add Friend
-</div>
+<h2>Add Friend</h2>
+<form method='post'>
+    {% csrf_token %}
+    <table>
+        {{ friend_form.as_table }}
+    </table>
+    <input type='submit'>
+</form>
+{% endblock %}

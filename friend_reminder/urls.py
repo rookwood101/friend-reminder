@@ -20,5 +20,6 @@ from main import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('', views.home, name='home')
+    path('', views.home, name='home'),
+    path('webpush/', include('webpush.urls'))
 ]

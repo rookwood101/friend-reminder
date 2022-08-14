@@ -9,6 +9,8 @@ python = "^3.10"
 Django = "^4.1"
 python-dotenv = "^0.20.0"
 gunicorn = "^20.1.0"
+django-webpush = "^0.3.4"
+six = "^1.16.0"
 
 [tool.poetry.dev-dependencies]
 

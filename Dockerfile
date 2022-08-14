@@ -2,14 +2,6 @@ ARG PYTHON_VERSION=3.10
 
 FROM python:${PYTHON_VERSION}
 
-RUN apt-get update && apt-get install -y \
-    python3-pip \
-    python3-venv \
-    python3-dev \
-    python3-setuptools \
-    python3-wheel
-
-# install poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH=/root/.local/bin:$PATH
 

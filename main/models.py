@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing_extensions import Self
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -20,3 +21,11 @@ class Friend(models.Model):
 class UserPreferences(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     timezone = models.TextField()
+
+    @staticmethod
+    def get_or_create(user: User) -> Self:
+        preferences: UserPreferences = UserPreferences.objects.filter(user=user).first()
+        if preferences:
+            return preferences
+        else:
+            return UserPreferences(user=user)

@@ -24,5 +24,11 @@
     </table>
     <input type='submit'>
 </form>
+
+<h2>Test push</h2>
+<form method='post' action='{% url 'test_push' %}'>
+    {% csrf_token %}
+    <input type='submit'>
+</form>
 {% webpush_button %}
 {% endblock %}

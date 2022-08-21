@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', views.home, name='home'),
-    path('webpush/', include('webpush.urls'))
+    path('webpush/', include('webpush.urls')),
+    path('test_push', views.test_push, name='test_push'),
 ]

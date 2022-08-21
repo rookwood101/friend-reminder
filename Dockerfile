@@ -2,22 +2,26 @@ ARG PYTHON_VERSION=3.10
 
 FROM python:${PYTHON_VERSION}
 
+RUN apt-get update && apt-get install -y supervisor cron
+
 RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH=/root/.local/bin:$PATH
 
 RUN mkdir -p /app
 WORKDIR /app
 
+COPY jobs.cron ./
+RUN crontab jobs.cron
+
 COPY poetry.lock pyproject.toml ./
-RUN poetry config virtualenvs.in-project true --local
-RUN poetry install --no-dev
+RUN poetry config virtualenvs.in-project true --local \
+ && poetry install --no-dev
 
 COPY . .
 
 RUN poetry run python manage.py collectstatic --noinput
 
 
-EXPOSE 8080
+CMD ["/usr/bin/supervisord", "-n", "-c", "supervisord.conf"]
 
-# replace APP_NAME with module name
-CMD poetry run python manage.py migrate && poetry run gunicorn --bind :8080 --workers 2 friend_reminder.wsgi
+EXPOSE 8080

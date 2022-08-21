@@ -2,8 +2,9 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from .forms import FriendForm
+from webpush import send_user_notification
 
+from main.forms import FriendForm
 from main.models import Friend
 
 
@@ -29,3 +30,15 @@ def home(request: HttpRequest) -> HttpResponse:
         'friend_form': friend_form,
     })
 
+
+@login_required
+@require_http_methods(['POST'])
+def test_push(request: HttpRequest) -> HttpResponse:
+    payload = {
+        "head": "Welcome!",
+        "body": "Hello World",
+        "icon": "https://i.imgur.com/dRDxiCQ.png",
+        "url": request.build_absolute_uri('/'),
+    }
+    send_user_notification(user=request.user, payload=payload, ttl=1000)
+    return HttpResponseRedirect('/')

@@ -77,10 +77,7 @@ WSGI_APPLICATION = 'friend_reminder.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-if DEBUG:
-    db_path = BASE_DIR / 'db.sqlite3'
-else:
-    db_path = "/db/db.sqlite3"
+db_path = os.environ.get("DB_PATH", "/db/db.sqlite3")
 
 DATABASES = {
     'default': {

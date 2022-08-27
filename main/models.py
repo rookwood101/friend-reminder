@@ -1,22 +1,53 @@
-from datetime import timedelta
+from datetime import date, datetime, time, timedelta
 from typing_extensions import Self
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from webpush import send_user_notification
 
 class Friend(models.Model):
     name = models.TextField()
     remind_period_days = models.PositiveIntegerField()
+    next_reminder = models.DateField()
     friend_of = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def next_reminder(self) -> timedelta:
+    def send_reminder_if_applicable(self):
+        now = timezone.now()
+        if now < datetime.combine(self.next_reminder, time(12, 0, 0), now.tzinfo):
+            return
+
+        payload = {
+            'head': 'Friend Reminder',
+            'body': f'Contact {self.name} every {self.remind_period_days} days',
+            'icon': 'https://i.imgur.com/8n3O62r.png',
+            'url': 'https://friend-reminder.fly.dev/',
+        }
+        seconds_to_store_if_undeliverable = timedelta(days=self.remind_period_days) / 2 / timedelta(seconds=1)
+        send_user_notification(user=self.friend_of, payload=payload, ttl=seconds_to_store_if_undeliverable)
+        print(f'Successfully sent reminder to {self.friend_of.username}')
+
+        self.update_next_reminder()
+        
+    def update_next_reminder(self):
         remind_period = timedelta(days=self.remind_period_days)
-        since_creation: timedelta = timezone.now() - self.created_at
-        since_last_reminder: timedelta = since_creation % remind_period
-        next_reminder =  remind_period - since_last_reminder
-        return next_reminder
+        today = timezone.now().date()
+        if self.next_reminder is None:
+            self.next_reminder = today + (remind_period / 2)
+            self.save()
+            return
+
+        since_last_reminder: timedelta = today - self.next_reminder
+        if since_last_reminder < timedelta(0):
+            # next reminder is in future, no change needed
+            return
+
+        until_new_next_reminder: timedelta = remind_period - (since_last_reminder % remind_period)
+        self.next_reminder =  today + until_new_next_reminder
+        self.save()
+
+    
 
 class UserPreferences(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

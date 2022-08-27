@@ -12,8 +12,12 @@ import os
 from dotenv import load_dotenv
 
 from django.core.wsgi import get_wsgi_application
+from django.contrib.staticfiles.handlers import StaticFilesHandler
 
 load_dotenv()
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'friend_reminder.settings')
 
-application = get_wsgi_application()
+if os.environ.get('SERVE_STATIC') == 'True':
+    application = StaticFilesHandler(get_wsgi_application())
+else:
+    application = get_wsgi_application()

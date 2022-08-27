@@ -21,7 +21,7 @@ def home(request: HttpRequest) -> HttpResponse:
             if friend_form.is_valid():
                 friend: Friend = friend_form.save(commit=False)
                 friend.friend_of = request.user
-                friend.save()
+                friend.update_next_reminder()
 
                 return HttpResponseRedirect('/')
 

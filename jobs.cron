@@ -1,1 +1,1 @@
-* * * * * echo "TODO https://django-cron.readthedocs.io" > /proc/1/fd/1 2> /proc/1/fd/2
+*/5 * * * * (cd /app && . ./.cronenv && poetry run python manage.py sendreminders) > /proc/1/fd/1 2> /proc/1/fd/2

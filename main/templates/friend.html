@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<h1>Friend Info - {{ friend.name }}</h1>
+<ul>
+    <li>Every {{ friend.remind_period_days }} days</li>
+    <li>Next: {{ friend.next_reminder }}</li>
+    <li>Created: {{ friend.created_at }}</li>
+</ul>
+<form method='post'>
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input type='submit'>
+</form>
+{% endblock %}

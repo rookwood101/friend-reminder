@@ -5,3 +5,4 @@ fly.toml
 .vscode
 static
 run.sh
+debug.sh

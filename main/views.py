@@ -1,10 +1,10 @@
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, HttpResponseNotFound
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from webpush import send_user_notification
 
-from main.forms import FriendForm
+from main.forms import FriendCreateForm, FriendEditForm
 from main.models import Friend
 
 
@@ -12,12 +12,12 @@ from main.models import Friend
 @require_http_methods(['GET', 'POST'])
 def home(request: HttpRequest) -> HttpResponse:
     friends = Friend.objects.filter(friend_of=request.user)
-    friend_form = FriendForm()
+    friend_form = FriendCreateForm()
 
     if request.method == 'POST':
         form_name = request.POST['form_name']
         if form_name == 'Friend':
-            friend_form = FriendForm(request.POST)
+            friend_form = FriendCreateForm(request.POST)
             if friend_form.is_valid():
                 friend: Friend = friend_form.save(commit=False)
                 friend.friend_of = request.user
@@ -30,6 +30,25 @@ def home(request: HttpRequest) -> HttpResponse:
         'friend_form': friend_form,
     })
 
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def friend(request: HttpRequest, id: int) -> HttpResponse:
+    friend = get_object_or_404(Friend, pk=id)
+    form = FriendEditForm(instance=friend)
+    if friend.friend_of != request.user:
+        return HttpResponseNotFound()
+
+    if request.method == 'POST':
+        friend_form = FriendEditForm(request.POST, instance=friend)
+        if friend_form.is_valid():
+            friend_form.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', f'/friend/{id}'))
+    
+    return render(request, 'friend.html', {
+        'friend': friend,
+        'form': form,
+    })
 
 @login_required
 @require_http_methods(['POST'])

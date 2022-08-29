@@ -10,6 +10,7 @@ class Friend(models.Model):
     remind_period_days = models.PositiveIntegerField()
     next_reminder = models.DateField()
     friend_of = models.ForeignKey(User, on_delete=models.CASCADE)
+    log = models.TextField(default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -19,10 +20,10 @@ class Friend(models.Model):
             return False
 
         payload = {
-            'head': 'Friend Reminder',
-            'body': f'Contact {self.name} every {self.remind_period_days} days',
+            'head': f'Contact {self.name} - Friend Reminder',
+            'body': f'{self.log.split()[-1]}. Every {self.remind_period_days} days',
             'icon': 'https://i.imgur.com/8n3O62r.png',
-            'url': 'https://friend-reminder.fly.dev/',
+            'url': f'https://friend-reminder.fly.dev/friend/{self.pk}',
         }
         # max ttl for some webpush servers is 28 days, it automatically gets rounded though
         seconds_to_store_if_undeliverable = int(

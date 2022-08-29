@@ -12,7 +12,7 @@
 <h2>Friends</h2>
 <ul>
 {% for friend in friends %}
-    <li>{{ friend.name }} - Every {{ friend.remind_period_days }} days - Next: {{ friend.next_reminder }} - Created: {{ friend.created_at }}</li>
+    <li><a href='{% url 'friend' id=friend.pk %}'>{{ friend.name }}</a> - Every {{ friend.remind_period_days }} days - Next: {{ friend.next_reminder }} - Created: {{ friend.created_at }}</li>
 {% endfor %}
 </ul>
 

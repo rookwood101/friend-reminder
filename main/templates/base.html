@@ -17,6 +17,7 @@
 </head>
 <body>
     {% if request.user.is_authenticated %}
+        <a href='{% url 'home' %}'>Home</a> | 
         <a href='{% url 'logout' %}'>Log Out</a>
     {% endif %}
     {% block body %}

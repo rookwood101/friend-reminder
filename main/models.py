@@ -13,10 +13,10 @@ class Friend(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def send_reminder_if_applicable(self):
+    def send_reminder_if_applicable(self) -> bool:
         now = timezone.now()
         if now < datetime.combine(self.next_reminder, time(12, 0, 0), now.tzinfo):
-            return
+            return False
 
         payload = {
             'head': 'Friend Reminder',
@@ -24,11 +24,15 @@ class Friend(models.Model):
             'icon': 'https://i.imgur.com/8n3O62r.png',
             'url': 'https://friend-reminder.fly.dev/',
         }
-        seconds_to_store_if_undeliverable = timedelta(days=self.remind_period_days) / 2 / timedelta(seconds=1)
+        # max ttl for some webpush servers is 28 days, it automatically gets rounded though
+        seconds_to_store_if_undeliverable = int(
+            timedelta(days=1) / timedelta(seconds=1)
+        )
         send_user_notification(user=self.friend_of, payload=payload, ttl=seconds_to_store_if_undeliverable)
         print(f'Successfully sent reminder to {self.friend_of.username}')
 
         self.update_next_reminder()
+        return True
         
     def update_next_reminder(self):
         remind_period = timedelta(days=self.remind_period_days)

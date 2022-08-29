@@ -9,7 +9,7 @@ processes = []
   PORT = "8080"
 
 [mounts]
-  source= "db"
+  source = "db"
   destination = "/db"
 
 [experimental]

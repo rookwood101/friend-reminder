@@ -7,11 +7,17 @@
     <li>Next: {{ friend.next_reminder }}</li>
     <li>Created: {{ friend.created_at }}</li>
 </ul>
-<form method='post'>
+<form method='POST'>
     {% csrf_token %}
     <table>
         {{ form.as_table }}
     </table>
-    <input type='submit'>
+    <input type='submit' value='Update'>
+</form>
+<br>
+<form method='POST'>
+    {% csrf_token %}
+    <input type='hidden' name='_method' value='DELETE'>
+    <input type='submit' value='Delete'>
 </form>
 {% endblock %}

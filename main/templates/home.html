@@ -17,18 +17,18 @@
 </ul>
 
 <h2>Add Friend</h2>
-<form method='post'>
+<form method='POST'>
     {% csrf_token %}
     <table>
         {{ friend_form.as_table }}
     </table>
-    <input type='submit'>
+    <input type='submit' value='Create'>
 </form>
 
 <h2>Test push</h2>
-<form method='post' action='{% url 'test_push' %}'>
-    {% csrf_token %}
-    <input type='submit'>
-</form>
 {% webpush_button %}
+<form method='POST' action='{% url 'test_push' %}'>
+    {% csrf_token %}
+    <input type='submit' value='Send Test Notification'>
+</form>
 {% endblock %}

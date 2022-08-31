@@ -23,7 +23,7 @@ def home(request: HttpRequest) -> HttpResponse:
                 friend.friend_of = request.user
                 friend.update_next_reminder()
 
-                return HttpResponseRedirect('/')
+                return HttpResponseRedirect(f'/friend/{friend.pk}')
 
     return render(request, 'home.html', {
         'friends': friends,
@@ -32,19 +32,23 @@ def home(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
-@require_http_methods(['GET', 'POST'])
+@require_http_methods(['GET', 'POST', 'DELETE'])
 def friend(request: HttpRequest, id: int) -> HttpResponse:
     friend = get_object_or_404(Friend, pk=id)
     form = FriendEditForm(instance=friend)
     if friend.friend_of != request.user:
         return HttpResponseNotFound()
 
-    if request.method == 'POST':
+    if request.method == 'DELETE' or request.method == 'POST' and request.POST['_method'] == 'DELETE':
+        friend.delete()
+        return HttpResponseRedirect('/')
+    elif request.method == 'POST':
         friend_form = FriendEditForm(request.POST, instance=friend)
         if friend_form.is_valid():
             friend_form.save()
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER', f'/friend/{id}'))
-    
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', f'/friend/{friend.pk}'))
+
+
     return render(request, 'friend.html', {
         'friend': friend,
         'form': form,

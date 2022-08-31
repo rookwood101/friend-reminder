@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'friend_reminder.middleware.TimezoneMiddleware'
+    'friend_reminder.middleware.TimezoneMiddleware',
 ]
 
 ROOT_URLCONF = 'friend_reminder.urls'

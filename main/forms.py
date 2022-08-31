@@ -16,7 +16,7 @@ class FriendCreateForm(ModelForm):
 class FriendEditForm(ModelForm):
     class Meta:
         model = Friend
-        fields = ['log', 'next_reminder']
+        fields = ['remind_period_days', 'log', 'next_reminder']
         widgets = {
             'next_reminder': Html5DateInput
         }

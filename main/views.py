@@ -39,7 +39,7 @@ def friend(request: HttpRequest, id: int) -> HttpResponse:
     if friend.friend_of != request.user:
         return HttpResponseNotFound()
 
-    if request.method == 'DELETE' or request.method == 'POST' and request.POST['_method'] == 'DELETE':
+    if request.method == 'DELETE' or (request.method == 'POST' and request.POST.get('_method') == 'DELETE'):
         friend.delete()
         return HttpResponseRedirect('/')
     elif request.method == 'POST':

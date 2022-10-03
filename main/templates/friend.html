@@ -4,7 +4,13 @@
 <h1>Friend Info - {{ friend.name }}</h1>
 <ul>
     <li>Every {{ friend.remind_period_days }} days</li>
-    <li>Next: {{ friend.next_reminder }}</li>
+    <li>
+        Next: {{ friend.next_reminder }}
+        <form method='POST' action='{% url 'friend_remind-tomorrow' id=friend.pk %}''>
+            {% csrf_token %}
+            <input type='submit' value='Remind Tomorrow'>
+        </form>
+    </li>
     <li>Created: {{ friend.created_at }}</li>
 </ul>
 <form method='POST'>

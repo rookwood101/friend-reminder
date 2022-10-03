@@ -22,6 +22,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('', views.home, name='home'),
     path('friend/<int:id>', views.friend, name='friend'),
+    path('friend/<int:id>/remind-tomorrow', views.remind_tomorrow, name='friend_remind-tomorrow'),
     path('webpush/', include('webpush.urls')),
     path('test_push', views.test_push, name='test_push'),
 ]

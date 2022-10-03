@@ -54,6 +54,17 @@ def friend(request: HttpRequest, id: int) -> HttpResponse:
         'form': form,
     })
 
+
+@login_required
+@require_http_methods(['POST'])
+def remind_tomorrow(request: HttpRequest, id: int) -> HttpResponse:
+    friend = get_object_or_404(Friend, pk=id)
+    if friend.friend_of != request.user:
+        return HttpResponseNotFound()
+    friend.remind_tomorrow()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', f'/friend/{friend.pk}'))
+
+
 @login_required
 @require_http_methods(['POST'])
 def test_push(request: HttpRequest) -> HttpResponse:

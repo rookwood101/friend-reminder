@@ -14,6 +14,11 @@ class Friend(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def remind_tomorrow(self):
+        today = timezone.now().date()
+        self.next_reminder = today + timedelta(days=1)
+        self.save()
+
     def send_reminder_if_applicable(self) -> bool:
         now = timezone.now()
         if now < datetime.combine(self.next_reminder, time(12, 0, 0), now.tzinfo):

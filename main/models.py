@@ -19,9 +19,14 @@ class Friend(models.Model):
         if now < datetime.combine(self.next_reminder, time(12, 0, 0), now.tzinfo):
             return False
 
+        self.send_reminder()
+        self.update_next_reminder()
+        return True
+
+    def send_reminder(self):
         payload = {
             'head': f'Contact {self.name} - Friend Reminder',
-            'body': f'{self.log.split()[-1]}. Every {self.remind_period_days} days',
+            'body': self.reminder_body(),
             'icon': 'https://i.imgur.com/8n3O62r.png',
             'url': f'https://friend-reminder.fly.dev/friend/{self.pk}',
         }
@@ -32,8 +37,8 @@ class Friend(models.Model):
         send_user_notification(user=self.friend_of, payload=payload, ttl=seconds_to_store_if_undeliverable)
         print(f'Successfully sent reminder to {self.friend_of.username}')
 
-        self.update_next_reminder()
-        return True
+    def reminder_body(self) -> str:
+        return self.log.split('\n')[-1] + f'. Every {self.remind_period_days} days'
         
     def update_next_reminder(self):
         remind_period = timedelta(days=self.remind_period_days)

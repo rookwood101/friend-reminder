@@ -62,11 +62,12 @@ class Friend(models.Model):
         self.next_reminder =  today + until_new_next_reminder
         self.save()
 
-    
 
 class UserPreferences(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     timezone = models.TextField()
+    stripe_customer_id = models.TextField(null=True, blank=False)
+    subscribed = models.BooleanField(default=False)
 
     @staticmethod
     def get_or_create(user: User) -> Self:

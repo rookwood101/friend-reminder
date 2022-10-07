@@ -152,5 +152,5 @@ MIGRATION_MODULES = {
     'webpush': 'apps.webpush.migrations'
 }
 
-LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/'
 GUEST_USER_CONVERT_REDIRECT_URL = '/'

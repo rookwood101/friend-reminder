@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'friend-reminder.fly.dev']
 # Application definition
 
 INSTALLED_APPS = [
+    'main',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'webpush',
-    'main',
+    'guest_user',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +59,7 @@ ROOT_URLCONF = 'friend_reminder.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,6 +86,11 @@ DATABASES = {
         'NAME': db_path,
     }
 }
+
+AUTHENTICATION_BACKENDS = [
+  'django.contrib.auth.backends.ModelBackend',
+  'guest_user.backends.GuestBackend',
+]
 
 
 # Password validation
@@ -145,3 +151,6 @@ WEBPUSH_SETTINGS = {
 MIGRATION_MODULES = {
     'webpush': 'apps.webpush.migrations'
 }
+
+LOGIN_URL = '/'
+GUEST_USER_CONVERT_REDIRECT_URL = '/'

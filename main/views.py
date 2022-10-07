@@ -2,13 +2,14 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, HttpRes
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from guest_user.decorators import allow_guest_user
 from webpush import send_user_notification
 
 from main.forms import FriendCreateForm, FriendEditForm
 from main.models import Friend
 
 
-@login_required
+@allow_guest_user
 @require_http_methods(['GET', 'POST'])
 def home(request: HttpRequest) -> HttpResponse:
     friends = Friend.objects.filter(friend_of=request.user)

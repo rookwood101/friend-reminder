@@ -12,6 +12,7 @@ gunicorn = "^20.1.0"
 django-webpush = "^0.3.4"
 six = "^1.16.0"
 typing-extensions = "^4.3.0"
+django-guest-user = "^0.5.2"
 
 [tool.poetry.dev-dependencies]
 

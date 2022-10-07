@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<form action='{% url 'guest_user_convert' %}' method='POST'>
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type='submit'>Sign Up</button>
+</form>
+{% endblock %}

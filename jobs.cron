@@ -1,1 +1,2 @@
 */5 * * * * (cd /app && . ./.cronenv && poetry run python manage.py sendreminders) > /proc/1/fd/1 2> /proc/1/fd/2
+0   0 * * * (cd /app && . ./.cronenv && poetry run python manage.py delete_expired_users) > /proc/1/fd/1 2> /proc/1/fd/2

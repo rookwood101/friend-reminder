@@ -24,5 +24,6 @@ urlpatterns = [
     path('friend/<int:id>', views.friend, name='friend'),
     path('friend/<int:id>/remind-tomorrow', views.remind_tomorrow, name='friend_remind-tomorrow'),
     path('webpush/', include('webpush.urls')),
+    path("convert/", include("guest_user.urls")),
     path('test_push', views.test_push, name='test_push'),
 ]

@@ -18,13 +18,13 @@
     {% endblock %}
 </head>
 <body>
+    <a href='{% url 'home' %}'>Home</a> |
     {% if user|is_guest_user %}
-        <a href='{% url 'home' %}'>Home</a> | 
-        <a href="{% url 'login' %}">Login</a> |
-        <a href="{% url 'guest_user_convert' %}">Sign up and save your data!</a>
+    <a href='{% url 'login' %}'>Login</a> |
+    <a href='{% url 'guest_user_convert' %}'>Sign up and save your data!</a>
     {% elif request.user.is_authenticated %}
-        <a href='{% url 'home' %}'>Home</a> | 
-        <a href='{% url 'logout' %}'>Log Out</a>
+    <a href='{% url 'subscribe' %}'>Subscribe (£1/mth)</a> |
+    <a href='{% url 'logout' %}'>Log Out</a>
     {% endif %}
     {% block body %}
     {% endblock %}

@@ -2,7 +2,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, HttpRes
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from guest_user.decorators import allow_guest_user
+from guest_user.decorators import allow_guest_user, regular_user_required
 from webpush import send_user_notification
 
 from main.forms import FriendCreateForm, FriendEditForm
@@ -77,3 +77,10 @@ def test_push(request: HttpRequest) -> HttpResponse:
     }
     send_user_notification(user=request.user, payload=payload, ttl=1000)
     return HttpResponseRedirect('/')
+
+
+@regular_user_required
+@login_required
+@require_http_methods(['GET'])
+def subscribe(request: HttpRequest) -> HttpResponse:
+    return render(request, 'subscribe.html', {})

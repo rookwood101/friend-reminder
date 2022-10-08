@@ -96,4 +96,4 @@ class UserPreferences(models.Model):
         if preferences:
             return preferences
         else:
-            return UserPreferences(user_pk=user.pk if user else user_pk)
+            return UserPreferences(user_id=user.pk if user else user_pk)

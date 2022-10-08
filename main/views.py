@@ -109,7 +109,8 @@ def create_checkout_session(request: HttpRequest) -> HttpResponse:
 
     prices = stripe.Price.list(
         lookup_keys=['friend-reminder-unlimited'],
-        expand=['data.product']
+        expand=['data.product'],
+        limit=1,
     )
 
     checkout_session = stripe.checkout.Session.create(

@@ -152,7 +152,8 @@ WEBPUSH_SETTINGS = {
 }
 
 MIGRATION_MODULES = {
-    'webpush': 'apps.webpush.migrations'
+    'webpush': 'apps.webpush.migrations',
+    'guest_user': 'apps.guest_user.migrations',
 }
 
 LOGIN_REDIRECT_URL = '/'

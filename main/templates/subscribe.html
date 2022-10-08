@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
 
 {% block body %}
+{% if not preferences.subscribed %}
 <h2>Subscribe to Friend Reminder Unlimited</h2>
-If you want to add more than 5 friends then you'll need to pay £1/month for Friend Reminder Unlimited.
+If you need to add more than 5 friends then you'll want to pay £1/month for Friend Reminder Unlimited.
 <form action='{% url 'create-checkout-session' %}' method='POST'>
     {% csrf_token %}
     <input type='hidden' name='lookup_key' value='friend-reminder-unlimited' />
     <button type='submit'>Subscribe for £1/mth</button>
 </form>
+{% else %}
+<h2>You are subscribed to Friend Reminder Unlimited!</h2>
+TODO: Add button to manage billing account: https://stripe.com/docs/billing/quickstart?lang=python&client=html
+{% endif %}
 {% endblock %}
 

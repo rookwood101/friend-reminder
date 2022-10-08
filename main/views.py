@@ -89,13 +89,17 @@ def test_push(request: HttpRequest) -> HttpResponse:
 @login_required
 @require_http_methods(['GET'])
 def subscribe(request: HttpRequest) -> HttpResponse:
-    return render(request, 'subscribe.html', {})
+    preferences: UserPreferences = UserPreferences.get_or_create(request.user)
+    return render(request, 'subscribe.html', {
+        'preferences': preferences
+    })
 
 
 @regular_user_required
 @login_required
 @require_http_methods(['POST'])
 def create_checkout_session(request: HttpRequest) -> HttpResponse:
+    # TODO: if already subscribed don't subscribe
     prices = stripe.Price.list(
         lookup_keys=[request.POST['lookup_key']],
         expand=['data.product']

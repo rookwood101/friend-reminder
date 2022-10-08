@@ -27,6 +27,8 @@ urlpatterns = [
     path('create-checkout-session', views.create_checkout_session, name='create-checkout-session'),
     path('checkout-cancelled', views.checkout_cancelled, name='checkout-cancelled'),
     path('subscription-success', views.subscription_success, name='subscription-success'),
+    path('create-portal-session', views.create_portal_session, name='create-portal-session'),
+    path('stripe-webhook', views.stripe_webhook, name='stripe-webhook'),
     path('webpush/', include('webpush.urls')),
     path('convert/', include("guest_user.urls")),
     path('test_push', views.test_push, name='test_push'),

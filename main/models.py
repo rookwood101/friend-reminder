@@ -1,4 +1,5 @@
 from datetime import date, datetime, time, timedelta
+from typing import Optional
 from typing_extensions import Self
 from django.db import models
 from django.contrib.auth.models import User
@@ -67,18 +68,32 @@ class Friend(models.Model):
 
 
 class UserPreferences(models.Model):
+    class SubscriptionStatus(models.TextChoices):
+        INACTIVE = 'Inactive'
+        PENDING_PAYMENT = 'Pending Payment'
+        ACTIVE = 'Active'
+
     user: User = models.OneToOneField(User, on_delete=models.CASCADE)
     timezone = models.TextField()
-    stripe_customer_id = models.TextField(null=True, blank=False)
-    subscribed = models.BooleanField(default=False)
+    stripe_customer_id = models.TextField(null=True, blank=False, unique=True)
+    subscription_status = models.CharField(
+        max_length=255,
+        choices=SubscriptionStatus.choices,
+        default=SubscriptionStatus.INACTIVE,
+    )
 
     def __str__(self):
         return f'{self.user.username}\'s preferences'
 
     @staticmethod
-    def get_or_create(user: User) -> Self:
-        preferences: UserPreferences = UserPreferences.objects.filter(user=user).first()
+    def get_or_create(user: Optional[User] = None, user_pk: Optional[int] = None) -> Self:
+        if user:
+            preferences: UserPreferences = UserPreferences.objects.filter(user=user).first()
+        elif user_pk is not None:
+            preferences: UserPreferences = UserPreferences.objects.filter(user__pk=user_pk).first()
+        else:
+            raise RuntimeError('no user or user_pk provided')
         if preferences:
             return preferences
         else:
-            return UserPreferences(user=user)
+            return UserPreferences(user_pk=user.pk if user else user_pk)

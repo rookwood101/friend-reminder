@@ -1,8 +1,10 @@
 import json
+import time
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from guest_user.decorators import allow_guest_user, regular_user_required
 import stripe
@@ -89,19 +91,22 @@ def test_push(request: HttpRequest) -> HttpResponse:
 @login_required
 @require_http_methods(['GET'])
 def subscribe(request: HttpRequest) -> HttpResponse:
-    preferences: UserPreferences = UserPreferences.get_or_create(request.user)
-    return render(request, 'subscribe.html', {
-        'preferences': preferences
-    })
+    return render(request, 'subscribe.html', {})
 
 
 @regular_user_required
 @login_required
 @require_http_methods(['POST'])
 def create_checkout_session(request: HttpRequest) -> HttpResponse:
-    # TODO: if already subscribed don't subscribe
+    preferences: UserPreferences = UserPreferences.get_or_create(request.user)
+    if (
+        preferences.subscription_status == UserPreferences.SubscriptionStatus.ACTIVE
+        or preferences.subscription_status == UserPreferences.SubscriptionStatus.PENDING_PAYMENT
+    ):
+        return HttpResponseSeeOther('/subscribe')
+
     prices = stripe.Price.list(
-        lookup_keys=[request.POST['lookup_key']],
+        lookup_keys=['friend-reminder-unlimited'],
         expand=['data.product']
     )
 
@@ -114,6 +119,7 @@ def create_checkout_session(request: HttpRequest) -> HttpResponse:
             },
         ],
         mode='subscription',
+        # build_absolute_uri encodes curly braces such that stripe does not substitute the checkout session id
         success_url=request.build_absolute_uri('/subscription-success') + '?checkout_session_id={CHECKOUT_SESSION_ID}',
         cancel_url=request.build_absolute_uri('/subscribe'),
     )
@@ -137,17 +143,16 @@ def subscription_success(request: HttpRequest) -> HttpResponse:
 
     preferences: UserPreferences = UserPreferences.get_or_create(request.user)
     preferences.stripe_customer_id = checkout_session.customer
-    preferences.save()
 
     if checkout_session.payment_status == 'paid':
-        preferences.subscribed = True
-        preferences.save()
-        # TODO: more pleasant page which allows you to reach home page
-        return HttpResponse('Subscribed successfully')
+        preferences.subscription_status = UserPreferences.SubscriptionStatus.ACTIVE
     else:
-        return HttpResponse('Your payment is still processing. Please come back later to check if your subscription was successful')
+        preferences.subscription_status = UserPreferences.SubscriptionStatus.PENDING_PAYMENT
+    preferences.save()
+    return HttpResponseSeeOther('/subscribe')
 
 
+@csrf_exempt
 @require_http_methods(['POST'])
 def stripe_webhook(request: HttpRequest) -> HttpResponse:
     # Replace this endpoint secret with your endpoint's unique secret
@@ -156,25 +161,41 @@ def stripe_webhook(request: HttpRequest) -> HttpResponse:
     # at https://dashboard.stripe.com/webhooks
     webhook_secret = settings.STRIPE_WEBHOOK_SECRET
     signature = request.headers.get('stripe-signature')
-    try:
-        body_json = json.loads(request.body.decode('utf-8'))
-        event: stripe.Event = stripe.Webhook.construct_event(payload=body_json, sig_header=signature, secret=webhook_secret)
-    except Exception:
-        return HttpResponseBadRequest()
+    event: stripe.Event = stripe.Webhook.construct_event(payload=request.body, sig_header=signature, secret=webhook_secret)
     # Get the type of webhook event sent - used to check the status of PaymentIntents.
-    if event.type == 'customer.subscription.created':
+    if event.type == 'checkout.session.completed':
+        checkout_session: stripe.checkout.Session = event.data.object
+        preferences: UserPreferences = UserPreferences.get_or_create(user_pk=checkout_session.client_reference_id)
+        preferences.stripe_customer_id = checkout_session.customer
+        preferences.save()
+    elif event.type == 'customer.subscription.created':
         subscription = event.data.object
-        preferences = UserPreferences.objects.filter(stripe_customer_id=subscription.customer)
-        preferences.subscribed = True
+        preferences = get_object_or_404(UserPreferences, stripe_customer_id=subscription.customer)
+        preferences.subscription_status = UserPreferences.SubscriptionStatus.ACTIVE
         preferences.save()
 
     elif event.type == 'customer.subscription.deleted':
         subscription = event.data.object
-        preferences = UserPreferences.objects.filter(stripe_customer_id=subscription.customer)
-        preferences.subscribed = False
+        preferences = get_object_or_404(UserPreferences, stripe_customer_id=subscription.customer)
+        preferences.subscription_status = UserPreferences.SubscriptionStatus.INACTIVE
         preferences.save()
     else:
         print(f'Unhandled webhook notification: {event.type}')
 
 
-    return HttpResponse(status_code=200)
+    return HttpResponse()
+
+
+@regular_user_required
+@login_required
+@require_http_methods(['POST'])
+def create_portal_session(request: HttpRequest) -> HttpResponse:
+    preferences: UserPreferences = UserPreferences.get_or_create(request.user)
+    if preferences.stripe_customer_id is None:
+        return HttpResponseSeeOther('/subscribe')
+
+    portal_session = stripe.billing_portal.Session.create(
+        customer=preferences.stripe_customer_id,
+        return_url=request.build_absolute_uri('/'),
+    )
+    return HttpResponseSeeOther(portal_session.url)

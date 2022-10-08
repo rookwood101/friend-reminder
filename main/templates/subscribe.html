@@ -1,17 +1,26 @@
 {% extends 'base.html' %}
 
 {% block body %}
-{% if not preferences.subscribed %}
+{% if preferences.subscription_status == preferences.SubscriptionStatus.INACTIVE %}
 <h2>Subscribe to Friend Reminder Unlimited</h2>
 If you need to add more than 5 friends then you'll want to pay £1/month for Friend Reminder Unlimited.
 <form action='{% url 'create-checkout-session' %}' method='POST'>
     {% csrf_token %}
-    <input type='hidden' name='lookup_key' value='friend-reminder-unlimited' />
     <button type='submit'>Subscribe for £1/mth</button>
 </form>
-{% else %}
+{% elif preferences.subscription_status == preferences.SubscriptionStatus.ACTIVE %}
 <h2>You are subscribed to Friend Reminder Unlimited!</h2>
-TODO: Add button to manage billing account: https://stripe.com/docs/billing/quickstart?lang=python&client=html
+<form action="/create-portal-session" method="POST">
+    {% csrf_token %}
+    <button id="checkout-and-portal-button" type="submit">Manage your billing information</button>
+</form>
+{% elif preferences.subscription_status == preferences.SubscriptionStatus.PENDING %}
+<h2>Your subscription payment is pending</h2>
+This probably means something went wrong.
+<form action="/create-portal-session" method="POST">
+    {% csrf_token %}
+    <button id="checkout-and-portal-button" type="submit">Manage your billing information</button>
+</form>
 {% endif %}
 {% endblock %}
 

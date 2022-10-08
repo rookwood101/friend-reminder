@@ -14,6 +14,9 @@ class Friend(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f'{self.friend_of.username}\'s friend {self.name}'
+
     def remind_tomorrow(self):
         today = timezone.now().date()
         self.next_reminder = today + timedelta(days=1)
@@ -64,10 +67,13 @@ class Friend(models.Model):
 
 
 class UserPreferences(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user: User = models.OneToOneField(User, on_delete=models.CASCADE)
     timezone = models.TextField()
     stripe_customer_id = models.TextField(null=True, blank=False)
     subscribed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.user.username}\'s preferences'
 
     @staticmethod
     def get_or_create(user: User) -> Self:

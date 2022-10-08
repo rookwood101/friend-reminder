@@ -142,6 +142,7 @@ def subscription_success(request: HttpRequest) -> HttpResponse:
     if checkout_session.payment_status == 'paid':
         preferences.subscribed = True
         preferences.save()
+        # TODO: more pleasant page which allows you to reach home page
         return HttpResponse('Subscribed successfully')
     else:
         return HttpResponse('Your payment is still processing. Please come back later to check if your subscription was successful')

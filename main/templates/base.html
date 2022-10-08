@@ -22,7 +22,8 @@
     {% if user|is_guest_user %}
     <a href='{% url 'login' %}'>Login</a> |
     <a href='{% url 'guest_user_convert' %}'>Sign up and save your data!</a>
-    {% elif request.user.is_authenticated %}
+    {% elif user.is_authenticated %}
+    <!--TODO: if subscribed don't show subscribe button - show manage account button-->
     <a href='{% url 'subscribe' %}'>Subscribe (£1/mth)</a> |
     <a href='{% url 'logout' %}'>Log Out</a>
     {% endif %}

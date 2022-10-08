@@ -5,6 +5,9 @@ from main.models import UserPreferences
 
 
 def user_preferences(request: HttpRequest) -> Dict:
-    return {
-        'preferences': UserPreferences.get_or_create(request.user)
-    }
+    if request.user.is_anonymous:
+        return {}
+    else:
+        return {
+            'preferences': UserPreferences.get_or_create(request.user)
+        }

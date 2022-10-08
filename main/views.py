@@ -20,6 +20,8 @@ class HttpResponseSeeOther(HttpResponseRedirect):
 @allow_guest_user
 @require_http_methods(['GET', 'POST'])
 def home(request: HttpRequest) -> HttpResponse:
+    if request.user.is_anonymous:
+        return HttpResponseSeeOther('/accounts/login')
     friends = Friend.objects.filter(friend_of=request.user)
     friend_form = FriendCreateForm()
 

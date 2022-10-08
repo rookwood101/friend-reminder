@@ -87,13 +87,12 @@ class UserPreferences(models.Model):
 
     @staticmethod
     def get_or_create(user: Optional[User] = None, user_pk: Optional[int] = None) -> Self:
-        if user:
-            preferences: UserPreferences = UserPreferences.objects.filter(user=user).first()
-        elif user_pk is not None:
-            preferences: UserPreferences = UserPreferences.objects.filter(user__pk=user_pk).first()
-        else:
-            raise RuntimeError('no user or user_pk provided')
+        if user_pk:
+            user = User.objects.get(pk=user_pk)
+        preferences: UserPreferences = UserPreferences.objects.filter(user=user).first()
         if preferences:
             return preferences
         else:
-            return UserPreferences(user_id=user.pk if user else user_pk)
+            preferences = UserPreferences(user=user)
+            preferences.save()
+            return preferences

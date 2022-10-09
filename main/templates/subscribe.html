@@ -14,7 +14,7 @@ If you need to add more than 5 friends then you'll want to pay £1/month for Fri
     {% csrf_token %}
     <button id="checkout-and-portal-button" type="submit">Manage your billing information</button>
 </form>
-{% elif preferences.subscription_status == preferences.SubscriptionStatus.PENDING %}
+{% elif preferences.subscription_status == preferences.SubscriptionStatus.PENDING_PAYMENT %}
 <h2>Your subscription payment is pending</h2>
 This probably means something went wrong.
 <form action="/create-portal-session" method="POST">

@@ -1,14 +1,27 @@
 {% extends 'base.html' %}
 {% load webpush_notifications %}
 
-
-
 {% block head %}
 {% webpush_header %}
 {% endblock %}
 
-
 {% block body %}
+<h2>Notification Settings</h2>
+To receive notifications on this device you must subscribe and allow push notifications.
+<br>
+You must subscribe to notifications on each device/browser you wish to receive them from (typically your phone).
+<br>
+Unfortunately push notifications are not supported on iPhone and iPad.
+<br>
+{% webpush_button %}
+<br>
+<br>
+Once you have subscribed to push notifications, send a test notification. It should say "Hello world!".
+<form method='POST' action='{% url 'test_push' %}'>
+    {% csrf_token %}
+    <input type='submit' value='Send Test Notification'>
+</form>
+
 <h2>Friends</h2>
 <ul>
 {% for friend in friends %}
@@ -25,10 +38,4 @@
     <input type='submit' value='Create'>
 </form>
 
-<h2>Test push</h2>
-{% webpush_button %}
-<form method='POST' action='{% url 'test_push' %}'>
-    {% csrf_token %}
-    <input type='submit' value='Send Test Notification'>
-</form>
 {% endblock %}

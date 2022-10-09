@@ -54,6 +54,7 @@ def friend(request: HttpRequest, id: int) -> HttpResponse:
         friend.delete()
         return HttpResponseSeeOther('/')
     elif request.method == 'POST':
+        friend_count = Friend.objects.filter(friend_of=request.user).count()
         friend_form = FriendEditForm(request.POST, instance=friend)
         if friend_form.is_valid():
             friend_form.save()

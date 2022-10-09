@@ -22,9 +22,8 @@ class HttpResponseSeeOther(HttpResponseRedirect):
 def home(request: HttpRequest) -> HttpResponse:
     if request.user.is_anonymous:
         return HttpResponseSeeOther('/accounts/login')
-    friends = Friend.objects.filter(friend_of=request.user)
-    friend_form = FriendCreateForm()
 
+    friend_form = FriendCreateForm()
     if request.method == 'POST':
         form_name = request.POST['form_name']
         if form_name == 'Friend':
@@ -36,9 +35,21 @@ def home(request: HttpRequest) -> HttpResponse:
 
                 return HttpResponseSeeOther(f'/friend/{friend.pk}')
 
+    friends = Friend.objects.filter(friend_of=request.user)
+    included_friends = []
+    excluded_friends = []
+    for friend in friends:
+        if friend.is_included_in_plan():
+            included_friends.append(friend)
+        else:
+            excluded_friends.append(friend)
+
     return render(request, 'home.html', {
         'friends': friends,
+        'included_friends': included_friends,
+        'excluded_friends': excluded_friends,
         'friend_form': friend_form,
+        'friend_limit': settings.FREE_PLAN_FRIEND_LIMIT
     })
 
 

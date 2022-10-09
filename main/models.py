@@ -1,6 +1,7 @@
 from datetime import date, datetime, time, timedelta
-from typing import Optional
+from typing import Dict, Optional
 from typing_extensions import Self
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -12,6 +13,7 @@ class Friend(models.Model):
     next_reminder = models.DateField()
     friend_of = models.ForeignKey(User, on_delete=models.CASCADE)
     log = models.TextField(default='')
+    # notifications shouldn't be sent if this is friend no.6+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -33,12 +35,7 @@ class Friend(models.Model):
         return True
 
     def send_reminder(self):
-        payload = {
-            'head': f'Contact {self.name} - Friend Reminder',
-            'body': self.reminder_body(),
-            'icon': 'https://i.imgur.com/8n3O62r.png',
-            'url': f'https://friend-reminder.fly.dev/friend/{self.pk}',
-        }
+        payload = self.reminder_payload()
         # max ttl for some webpush servers is 28 days, it automatically gets rounded though
         seconds_to_store_if_undeliverable = int(
             timedelta(days=1) / timedelta(seconds=1)
@@ -46,9 +43,23 @@ class Friend(models.Model):
         send_user_notification(user=self.friend_of, payload=payload, ttl=seconds_to_store_if_undeliverable)
         print(f'Successfully sent reminder to {self.friend_of.username}')
 
-    def reminder_body(self) -> str:
-        return self.log.split('\n')[-1] + f'. Every {self.remind_period_days} days'
-        
+    def reminder_payload(self) -> Dict[str, str]:
+        if self.is_included_in_plan():
+            title = f'Friend Reminder - Contact {self.name}'
+            body = self.log.split('\n')[-1] + f'. Every {self.remind_period_days} days'
+            url = f'https://friend-reminder.fly.dev/friend/{self.pk}'
+        else:
+            title = 'Friend Reminder - Contact ???'
+            body = 'This friend is not part of your free plan 5 friends. Subscribe to Friend Reminder Unlimited (£1/mth).'
+            url = 'https://friend-reminder.fly.dev/subscribe'
+
+        return {
+            'head': title,
+            'body': body,
+            'icon': 'https://i.imgur.com/8n3O62r.png',
+            'url': url,
+        }
+
     def update_next_reminder(self):
         remind_period = timedelta(days=self.remind_period_days)
         today = timezone.now().date()
@@ -65,6 +76,17 @@ class Friend(models.Model):
         until_new_next_reminder: timedelta = remind_period - (since_last_reminder % remind_period)
         self.next_reminder =  today + until_new_next_reminder
         self.save()
+    
+    def is_included_in_plan(self) -> bool:
+        """I.e. whether to send full notifications or if over 5 friend limit and on free plan"""
+        subscription_status = UserPreferences.get_or_create(self.friend_of).subscription_status
+        if subscription_status == UserPreferences.SubscriptionStatus.ACTIVE:
+            return True
+        free_friend_pks = Friend.objects.filter(friend_of=self.friend_of).order_by('created_at')[:settings.FREE_PLAN_FRIEND_LIMIT].values_list('id', flat=True)
+        if self.pk in free_friend_pks:
+            return True
+
+        return False
 
 
 class UserPreferences(models.Model):

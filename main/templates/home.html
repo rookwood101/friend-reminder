@@ -22,12 +22,37 @@ Once you have subscribed to push notifications, send a test notification. It sho
     <input type='submit' value='Send Test Notification'>
 </form>
 
-<h2>Friends</h2>
+<h2>
+    Friends ({{ included_friends|length }} /
+    {% if preferences.subscription_status != preferences.SubscriptionStatus.ACTIVE %}
+    {{ friend_limit }})
+    {% else %}
+    Unlimited)
+    {% endif %}
+</h2>
 <ul>
-{% for friend in friends %}
-    <li><a href='{% url 'friend' id=friend.pk %}'>{{ friend.name }}</a> - Every {{ friend.remind_period_days }} days - Next: {{ friend.next_reminder }} - Created: {{ friend.created_at }}</li>
-{% endfor %}
+    {% for friend in included_friends %}
+    <li>
+        <a href='{% url 'friend' id=friend.pk %}'>{{ friend.name }}</a>
+        - Every {{ friend.remind_period_days }} days
+        - Next: {{ friend.next_reminder }}
+        - Created: {{ friend.created_at }}
+    </li>
+    {% endfor %}
 </ul>
+{% if excluded_friends %}
+<h3><a href='{% url 'subscribe' %}' style='color: black'>Subscribe to Friend Reminder Unlimited</a> to receive notifications for these friends (£1/mth)</h3>
+<ul style='color: grey;'>
+    {% for friend in excluded_friends %}
+    <li>
+        <a href='{% url 'friend' id=friend.pk %}'>{{ friend.name }}</a>
+        - Every {{ friend.remind_period_days }} days
+        - Next: {{ friend.next_reminder }}
+        - Created: {{ friend.created_at }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
 
 <h2>Add Friend</h2>
 <form method='POST'>

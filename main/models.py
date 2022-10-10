@@ -47,11 +47,11 @@ class Friend(models.Model):
         if self.is_included_in_plan():
             title = f'Friend Reminder - Contact {self.name}'
             body = self.log.split('\n')[-1] + f'. Every {self.remind_period_days} days'
-            url = f'https://friend-reminder.fly.dev/friend/{self.pk}'
+            url = f'https://friend-reminder.com/friend/{self.pk}'
         else:
             title = 'Friend Reminder - Contact ???'
             body = 'This friend is not part of your free plan 5 friends. Subscribe to Friend Reminder Unlimited (£1/mth).'
-            url = 'https://friend-reminder.fly.dev/subscribe'
+            url = 'https://friend-reminder.com/subscribe'
 
         return {
             'head': title,

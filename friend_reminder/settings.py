@@ -28,7 +28,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'friend-reminder.fly.dev']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'friend-reminder.com', 'www.friend-reminder.com']
+
+PREPEND_WWW = not DEBUG
 
 
 # Application definition
@@ -141,7 +143,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'https://friend-reminder.fly.dev']
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'https://www.friend-reminder.com']
 
 LOGOUT_REDIRECT_URL = '/'
 

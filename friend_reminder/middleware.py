@@ -1,6 +1,6 @@
 from urllib import parse
 from django.utils import timezone
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponsePermanentRedirect
 
 from main.models import UserPreferences
 
@@ -21,4 +21,16 @@ class TimezoneMiddleware:
                     preferences.save()
         else:
             timezone.deactivate()
+        return self.get_response(request)
+
+
+class DomainRedirectMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        host = request.get_host().partition(":")[0]
+        if host == "friend-reminder.fly.dev" or host == "friend-reminder.com":
+            return HttpResponsePermanentRedirect("https://www.friend-reminder.com" + request.path)
+
         return self.get_response(request)
